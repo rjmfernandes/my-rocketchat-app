@@ -14,6 +14,7 @@
     "description": "The Rocket.Chat App which we will use to learn about coding Rocket.Chat apps.",
     "implements": [
         "IPreMessageSentPrevent",
-        "IPostMessageSent"
+        "IPostMessageSent",
+        "IPreFileUpload"
     ]
 }

@@ -38,6 +38,11 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
 
         //if file was bad we could throw an exception
         //throw new FileUploadNotAllowedException('File is Bad');
+        const user = await read.getUserReader().getById(context.file.userId);
+        const room = await read.getRoomReader().getById(context.file.rid);
+        if (room) {
+            this.notifyMessage(room, read, user, 'File inspected - Check logs');
+        }
     }
     async checkPostMessageSent?(message: IMessage, read: IRead, http: IHttp): Promise<boolean> {
         return message.room.slugifiedName != 'general';
@@ -64,5 +69,12 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         messageBuilder.setRoom(room);
         messageBuilder.setSender(author);
         modify.getCreator().finish(messageBuilder);
+    }
+    async notifyMessage(room: IRoom, read: IRead, sender: IUser, message: string): Promise<void> {
+        const notifier = read.getNotifier();
+        const messageBuilder = notifier.getMessageBuilder();
+        messageBuilder.setText(message);
+        messageBuilder.setRoom(room);
+        notifier.notifyUser(sender, messageBuilder.getMessage());
     }
 }

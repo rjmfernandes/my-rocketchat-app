@@ -8,5 +8,6 @@ import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 export class MyRocketChatAppApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
+        logger.debug('Hello, World!');
     }
 }

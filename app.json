@@ -1,0 +1,15 @@
+{
+    "id": "7beb6d63-7a8c-4a50-9d03-8cb845e0d60f",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.4.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Rui Fernandes",
+        "homepage": "rocket.chat",
+        "support": "rocket.chat"
+    },
+    "name": "My Rocket.Chat App",
+    "nameSlug": "my-rocketchat-app",
+    "classFile": "MyRocketChatAppApp.ts",
+    "description": "The Rocket.Chat App which we will use to learn about coding Rocket.Chat apps."
+}

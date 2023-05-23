@@ -12,5 +12,7 @@
     "nameSlug": "my-rocketchat-app",
     "classFile": "MyRocketChatAppApp.ts",
     "description": "The Rocket.Chat App which we will use to learn about coding Rocket.Chat apps.",
-    "implements": []
+    "implements": [
+        "IPreMessageSentPrevent"
+    ]
 }

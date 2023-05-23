@@ -21,11 +21,17 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         logger.debug('Hello, World!');
     }
     async [AppMethod.EXECUTE_PRE_FILE_UPLOAD](context: IFileUploadContext, read: IRead, http: IHttp, persis: IPersistence, modify: IModify): Promise<void> {
+        //this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Name: ' + context.file.name);
+        //this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Type: ' + context.file.type);
+        //this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Size: ' + context.file.size);
+
         console.log('ContentInspectionExampleAppApp - File Uploaded - Name: ' + context.file.name);
         console.log('ContentInspectionExampleAppApp - File Uploaded - Type: ' + context.file.type);
         console.log('ContentInspectionExampleAppApp - File Uploaded - Size: ' + context.file.size);
 
         if (context.file.type == 'text/plain') {
+            /*this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Content: ' +
+                String.fromCharCode.apply(null, context.content));*/
             console.log('ContentInspectionExampleAppApp - File Uploaded - Content: ' +
                 String.fromCharCode.apply(null, context.content));
         }

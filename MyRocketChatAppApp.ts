@@ -11,11 +11,11 @@ import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IMessage, IPostMessageSent } from '@rocket.chat/apps-engine/definition/messages';
 import { IPreMessageSentPrevent } from '@rocket.chat/apps-engine/definition/messages/IPreMessageSentPrevent';
 import { AppMethod, IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
-import { IRoom } from '@rocket.chat/apps-engine/definition/rooms/IRoom';
 import { IFileUploadContext } from '@rocket.chat/apps-engine/definition/uploads';
 import { IPreFileUpload } from '@rocket.chat/apps-engine/definition/uploads/IPreFileUpload';
 import { sendMessage, notifyMessage } from './utils/MessageUtils';
 import { HelloWorldCommand } from './commands/HelloWorldCommand';
+import { StatusUpdateCmd } from './commands/StatusUpdateCmd';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -25,10 +25,12 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
 
     public async extendConfiguration(
         configuration: IConfigurationExtend
-      ): Promise<void> {
-        const helloWorldCommand: HelloWorldCommand = new HelloWorldCommand()
-        await configuration.slashCommands.provideSlashCommand(helloWorldCommand)
-      }
+    ): Promise<void> {
+        const helloWorldCommand: HelloWorldCommand = new HelloWorldCommand();
+        await configuration.slashCommands.provideSlashCommand(helloWorldCommand);
+        const statusUpdateCommand: StatusUpdateCmd = new StatusUpdateCmd();
+        await configuration.slashCommands.provideSlashCommand(statusUpdateCommand);
+    }
 
     async [AppMethod.EXECUTE_PRE_FILE_UPLOAD](context: IFileUploadContext, read: IRead, http: IHttp, persis: IPersistence, modify: IModify): Promise<void> {
         //this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Name: ' + context.file.name);

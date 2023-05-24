@@ -11,9 +11,9 @@ export class HelloWorldCommand implements ISlashCommand {
     i18nDescription: string = 'hello_world_command_description';
     providesPreview: boolean = false;
     async executor(context: SlashCommandContext, read: IRead, modify: IModify, http: IHttp, persis: IPersistence): Promise<void> {
-        const creator: IModifyCreator = modify.getCreator()
-        const sender: IUser = (await read.getUserReader().getAppUser()) as IUser
-        const room: IRoom = context.getRoom()
+        const creator: IModifyCreator = modify.getCreator();
+        const sender: IUser = (await read.getUserReader().getAppUser()) as IUser;
+        const room: IRoom = context.getRoom();
         sendMessage(room, 'Hello, World!', sender, modify);
     }
 }

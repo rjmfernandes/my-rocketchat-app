@@ -1,5 +1,6 @@
 import {
     IAppAccessors,
+    IConfigurationExtend,
     IHttp,
     ILogger,
     IModify,
@@ -13,13 +14,22 @@ import { AppMethod, IAppInfo } from '@rocket.chat/apps-engine/definition/metadat
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms/IRoom';
 import { IFileUploadContext } from '@rocket.chat/apps-engine/definition/uploads';
 import { IPreFileUpload } from '@rocket.chat/apps-engine/definition/uploads/IPreFileUpload';
-import { IUser } from '@rocket.chat/apps-engine/definition/users/IUser';
+import { sendMessage, notifyMessage } from './utils/MessageUtils';
+import { HelloWorldCommand } from './commands/HelloWorldCommand';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
         logger.debug('Hello, World!');
     }
+
+    public async extendConfiguration(
+        configuration: IConfigurationExtend
+      ): Promise<void> {
+        const helloWorldCommand: HelloWorldCommand = new HelloWorldCommand()
+        await configuration.slashCommands.provideSlashCommand(helloWorldCommand)
+      }
+
     async [AppMethod.EXECUTE_PRE_FILE_UPLOAD](context: IFileUploadContext, read: IRead, http: IHttp, persis: IPersistence, modify: IModify): Promise<void> {
         //this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Name: ' + context.file.name);
         //this.getLogger().debug('ContentInspectionExampleAppApp - File Uploaded - Type: ' + context.file.type);
@@ -41,7 +51,7 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         const user = await read.getUserReader().getById(context.file.userId);
         const room = await read.getRoomReader().getById(context.file.rid);
         if (room) {
-            this.notifyMessage(room, read, user, 'File inspected - Check logs');
+            notifyMessage(room, read, user, 'File inspected - Check logs');
         }
     }
     async checkPostMessageSent?(message: IMessage, read: IRead, http: IHttp): Promise<boolean> {
@@ -54,27 +64,12 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         }
         const msg = `@${message.sender.username} said "${message.text}" in #${message.room.displayName}`;
         const author = await read.getUserReader().getAppUser();
-        this.sendMessage(general, msg, author ? author : message.sender, modify);
+        sendMessage(general, msg, author ? author : message.sender, modify);
     }
     async checkPreMessageSentPrevent?(message: IMessage, read: IRead, http: IHttp): Promise<boolean> {
         return message.room.slugifiedName != 'general';
     }
     async executePreMessageSentPrevent(message: IMessage, read: IRead, http: IHttp, persistence: IPersistence): Promise<boolean> {
         return message.text == 'test';
-    }
-    sendMessage(room: IRoom, textMessage: string, author: IUser, modify: IModify) {
-        const messageBuilder = modify.getCreator().startMessage({
-            text: textMessage,
-        } as IMessage);
-        messageBuilder.setRoom(room);
-        messageBuilder.setSender(author);
-        modify.getCreator().finish(messageBuilder);
-    }
-    async notifyMessage(room: IRoom, read: IRead, sender: IUser, message: string): Promise<void> {
-        const notifier = read.getNotifier();
-        const messageBuilder = notifier.getMessageBuilder();
-        messageBuilder.setText(message);
-        messageBuilder.setRoom(room);
-        notifier.notifyUser(sender, messageBuilder.getMessage());
     }
 }

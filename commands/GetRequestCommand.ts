@@ -1,13 +1,13 @@
 import { IRead, IModify, IHttp, IPersistence } from "@rocket.chat/apps-engine/definition/accessors";
-import { SlashCommandContext, ISlashCommandPreview, ISlashCommandPreviewItem } from "@rocket.chat/apps-engine/definition/slashcommands";
+import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
 import { ISlashCommand } from "@rocket.chat/apps-engine/definition/slashcommands/ISlashCommand";
 import { notifyMessage, sendMessage } from '../utils/MessageUtils';
 import { IRoom } from "@rocket.chat/apps-engine/definition/rooms/IRoom";
 
-export class HTTPRequestCommand implements ISlashCommand {
+export class GetRequestCommand implements ISlashCommand {
     command: string = 'get';
-    i18nParamsExample: string = 'http_request_command_params_example';
-    i18nDescription: string = 'http_request_command_description';
+    i18nParamsExample: string = 'get_request_command_params_example';
+    i18nDescription: string = 'get_request_command_description';
     providesPreview: boolean = false;
     async executor(context: SlashCommandContext, read: IRead, modify: IModify, http: IHttp, persis: IPersistence): Promise<void> {
         const user = context.getSender();

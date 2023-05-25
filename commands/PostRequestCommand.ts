@@ -18,11 +18,12 @@ export class PostRequestCommand implements ISlashCommand {
             return notifyMessage(room, read, user, "The URL and payload arguments are mandatory.");
         }
 
-        let payload = params.slice(1).join(' ');
+        let payload = params[1];
         let payloadObj =JSON.parse(payload);
 
         let options ={
-            content: payloadObj
+            content: JSON.stringify(payloadObj),
+            headers: JSON.parse('{\"content-type\": \"application/json\"}')
         };
 
         const response = await http.post(params[0], options);

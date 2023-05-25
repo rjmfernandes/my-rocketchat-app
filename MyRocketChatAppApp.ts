@@ -18,6 +18,7 @@ import { HelloWorldCommand } from './commands/HelloWorldCommand';
 import { StatusUpdateCmd } from './commands/StatusUpdateCmd';
 import { GetRequestCommand } from './commands/GetRequestCommand';
 import { PostRequestCommand } from './commands/PostRequestCommand';
+import { HttpRequestCommand } from './commands/HttpRequestCommand';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -36,6 +37,8 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         await configuration.slashCommands.provideSlashCommand(getRequestCommand);
         const postRequestCommand: PostRequestCommand = new PostRequestCommand();
         await configuration.slashCommands.provideSlashCommand(postRequestCommand);
+        const httpRequestCommand: HttpRequestCommand = new HttpRequestCommand();
+        await configuration.slashCommands.provideSlashCommand(httpRequestCommand);
     }
 
     async [AppMethod.EXECUTE_PRE_FILE_UPLOAD](context: IFileUploadContext, read: IRead, http: IHttp, persis: IPersistence, modify: IModify): Promise<void> {

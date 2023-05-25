@@ -6,5 +6,7 @@
     "get_request_command_params_example": "",
     "get_request_command_description": "A simple GET HTTP request slash command calling the URL passed as argument.",
     "post_request_command_params_example": "",
-    "post_request_command_description": "A simple POST HTTP request slash command calling the URL passed as first argument with payload from next arguments."
+    "post_request_command_description": "A simple POST HTTP request slash command calling the URL passed as first argument with payload from second argument.",
+    "http_request_command_params_example": "",
+    "http_request_command_description": "An http request slash command calling through GET/POST depending on 1st argument the URL passed as second argument with optional payload for POST passed as third argument."
 }

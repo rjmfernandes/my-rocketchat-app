@@ -2,5 +2,7 @@
     "hello_world_command_params_example": "",
     "hello_world_command_description": "A Hello World slash command.",
     "status_update_command_params_example": "",
-    "status_update_command_description": "It updates the status of the user to its first argument and uses the others for the status message."
+    "status_update_command_description": "It updates the status of the user to its first argument and uses the others for the status message.",
+    "http_request_command_params_example": "",
+    "http_request_command_description": "A simple GET HTTP request slash command calling the URL passed as argument."
 }

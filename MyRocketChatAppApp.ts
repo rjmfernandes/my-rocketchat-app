@@ -20,6 +20,7 @@ import { GetRequestCommand } from './commands/GetRequestCommand';
 import { PostRequestCommand } from './commands/PostRequestCommand';
 import { HttpRequestCommand } from './commands/HttpRequestCommand';
 import { SettingType } from '@rocket.chat/apps-engine/definition/settings/SettingType';
+import { RocketChatRequestCommand } from './commands/RocketChatRequestCommand';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -40,6 +41,8 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         await configuration.slashCommands.provideSlashCommand(postRequestCommand);
         const httpRequestCommand: HttpRequestCommand = new HttpRequestCommand();
         await configuration.slashCommands.provideSlashCommand(httpRequestCommand);
+        const rocketchatRequestCommand: RocketChatRequestCommand = new RocketChatRequestCommand();
+        await configuration.slashCommands.provideSlashCommand(rocketchatRequestCommand);
 
         await configuration.settings.provideSetting({
             id: 'my_rocketchat_app_auth_token',

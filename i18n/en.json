@@ -8,5 +8,9 @@
     "post_request_command_params_example": "",
     "post_request_command_description": "A simple POST HTTP request slash command calling the URL passed as first argument with payload from second argument.",
     "http_request_command_params_example": "",
-    "http_request_command_description": "An http request slash command calling through GET/POST depending on 1st argument the URL passed as second argument with optional payload for POST passed as third argument."
+    "http_request_command_description": "An http request slash command calling through GET/POST depending on 1st argument the URL passed as second argument with optional payload for POST passed as third argument.",
+    "my_rocketchat_app_auth_token_name": "Authentication Token",
+    "my_rocketchat_app_auth_token_desc": "The Rocket.Chat authentication token to be used in the header for Rocket.Chat API calls",
+    "my_rocketchat_app_user_id_name": "User ID",
+    "my_rocketchat_app_user_id_desc": "The Rocket.Chat User Id to be used in the header for Rocket.Chat API calls"
 }

@@ -19,6 +19,7 @@ import { StatusUpdateCmd } from './commands/StatusUpdateCmd';
 import { GetRequestCommand } from './commands/GetRequestCommand';
 import { PostRequestCommand } from './commands/PostRequestCommand';
 import { HttpRequestCommand } from './commands/HttpRequestCommand';
+import { SettingType } from '@rocket.chat/apps-engine/definition/settings/SettingType';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -39,6 +40,29 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         await configuration.slashCommands.provideSlashCommand(postRequestCommand);
         const httpRequestCommand: HttpRequestCommand = new HttpRequestCommand();
         await configuration.slashCommands.provideSlashCommand(httpRequestCommand);
+
+        await configuration.settings.provideSetting({
+            id: 'my_rocketchat_app_auth_token',
+            type: SettingType.STRING,
+            packageValue: 'YOUR_AUTH_TOKEN',
+            required: true,
+            public: false,
+            multiline: false,
+            i18nLabel: 'my_rocketchat_app_auth_token_name',
+            i18nDescription: 'my_rocketchat_app_auth_token_desc',
+        });
+
+        await configuration.settings.provideSetting({
+            id: 'my_rocketchat_app_user_id',
+            type: SettingType.STRING,
+            packageValue: 'YOUR_AUTH_TOKEN',
+            required: true,
+            public: false,
+            multiline: false,
+            i18nLabel: 'my_rocketchat_app_user_id_name',
+            i18nDescription: 'my_rocketchat_app_user_id_desc',
+        });
+
     }
 
     async [AppMethod.EXECUTE_PRE_FILE_UPLOAD](context: IFileUploadContext, read: IRead, http: IHttp, persis: IPersistence, modify: IModify): Promise<void> {

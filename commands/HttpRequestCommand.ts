@@ -3,6 +3,7 @@ import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
 import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
 import { ISlashCommand } from "@rocket.chat/apps-engine/definition/slashcommands/ISlashCommand";
 import { notifyMessage, sendMessage } from "../utils/MessageUtils";
+import { get,jsonFormat,post} from "../utils/HttpUtils";
 
 export class HttpRequestCommand implements ISlashCommand {
     command: string = 'http';
@@ -23,27 +24,20 @@ export class HttpRequestCommand implements ISlashCommand {
 
         switch (method) {
             case 'GET':
-                response = await http.get(params[1]);
+                response = await get(params[1],http);
                 break;
             case 'POST':
                 if (params.length < 3) {
                     return notifyMessage(room, read, user, "The payload argument is mandatory for POST.");
                 }
-                let payload = params[2];
-                let payloadObj = JSON.parse(payload);
 
-                let options = {
-                    content: JSON.stringify(payloadObj),
-                    headers: JSON.parse('{\"content-type\": \"application/json\"}')
-                };
-
-                response = await http.post(params[1], options);
+                response = await post(params[1], params[2],http);
                 break;
             default:
                 return notifyMessage(room, read, user, `The HTTP method ${method} is not implemented.`);
         }
 
-        const message = '```\n'+JSON.stringify(response.data, null, 2)+'\n```';
+        const message = jsonFormat(response);
         sendMessage(room, message, user, modify);
     }
 }

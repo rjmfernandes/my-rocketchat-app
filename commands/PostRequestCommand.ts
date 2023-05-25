@@ -3,6 +3,7 @@ import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashco
 import { ISlashCommand } from "@rocket.chat/apps-engine/definition/slashcommands/ISlashCommand";
 import { notifyMessage, sendMessage } from '../utils/MessageUtils';
 import { IRoom } from "@rocket.chat/apps-engine/definition/rooms/IRoom";
+import { jsonFormat, post} from "../utils/HttpUtils";
 
 export class PostRequestCommand implements ISlashCommand {
     command: string = 'post';
@@ -18,17 +19,8 @@ export class PostRequestCommand implements ISlashCommand {
             return notifyMessage(room, read, user, "The URL and payload arguments are mandatory.");
         }
 
-        let payload = params[1];
-        let payloadObj =JSON.parse(payload);
-
-        let options ={
-            content: JSON.stringify(payloadObj),
-            headers: JSON.parse('{\"content-type\": \"application/json\"}')
-        };
-
-        const response = await http.post(params[0], options);
-
-        const message = '```\n'+JSON.stringify(response.data, null, 2)+'\n```';
+        const response = await post(params[0],params[1],http);
+        const message = jsonFormat(response);
         sendMessage(room, message, user, modify);
     }
 }

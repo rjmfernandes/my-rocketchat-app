@@ -3,6 +3,7 @@ import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashco
 import { ISlashCommand } from "@rocket.chat/apps-engine/definition/slashcommands/ISlashCommand";
 import { notifyMessage, sendMessage } from '../utils/MessageUtils';
 import { IRoom } from "@rocket.chat/apps-engine/definition/rooms/IRoom";
+import { get, jsonFormat } from "../utils/HttpUtils";
 
 export class GetRequestCommand implements ISlashCommand {
     command: string = 'get';
@@ -18,8 +19,8 @@ export class GetRequestCommand implements ISlashCommand {
             return notifyMessage(room, read, user, "The URL argument is mandatory.");
         }
 
-        const response = await http.get(params[0]);
-        const message = '```\n'+JSON.stringify(response.data, null, 2)+'\n```';
+        const response = await get(params[0], http);
+        const message = jsonFormat(response);
         sendMessage(room, message, user, modify);
     }
 }

@@ -43,7 +43,7 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
 
         await configuration.settings.provideSetting({
             id: 'my_rocketchat_app_auth_token',
-            type: SettingType.STRING,
+            type: SettingType.PASSWORD,
             packageValue: 'YOUR_AUTH_TOKEN',
             required: true,
             public: false,

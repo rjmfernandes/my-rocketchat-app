@@ -42,6 +42,9 @@
         },
         {
             "name": "ui.interact"
+        },
+        {
+            "name": "api"
         }
     ]
 }

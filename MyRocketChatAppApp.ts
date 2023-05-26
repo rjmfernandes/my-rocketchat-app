@@ -25,6 +25,8 @@ import { OpenCtxBarCommand } from './commands/OpenCtxBarCommand';
 import { IUIKitInteractionHandler } from '@rocket.chat/apps-engine/definition/uikit/IUIKitActionHandler';
 import { UIKitActionButtonInteractionContext, IUIKitResponse } from '@rocket.chat/apps-engine/definition/uikit';
 import { UIActionButtonContext } from '@rocket.chat/apps-engine/definition/ui/UIActionButtonContext';
+import { ApiVisibility, ApiSecurity } from '@rocket.chat/apps-engine/definition/api';
+import { Endpoint } from './endpoints/Endpoint';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload, IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -105,6 +107,12 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
             actionId: 'my-action-id', // this identifies your button in the interaction event
             labelI18n: 'my-action-name', // key of the i18n string containing the name of the button
             context: UIActionButtonContext.ROOM_ACTION, // in what context the action button will be displayed in the UI
+        });
+
+        configuration.api.provideApi({
+            visibility: ApiVisibility.PUBLIC,
+            security: ApiSecurity.UNSECURE,
+            endpoints: [new Endpoint(this)],
         });
     }
 

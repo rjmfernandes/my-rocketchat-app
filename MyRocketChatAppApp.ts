@@ -2,6 +2,7 @@ import {
     IAppAccessors,
     IConfigurationExtend,
     IHttp,
+    ILivechatRead,
     ILogger,
     IModify,
     IPersistence,
@@ -23,10 +24,11 @@ import { SettingType } from '@rocket.chat/apps-engine/definition/settings/Settin
 import { RocketChatHeaderBuilder } from './commands/RocketChatHeaderBuilder';
 import { OpenCtxBarCommand } from './commands/OpenCtxBarCommand';
 import { IUIKitInteractionHandler } from '@rocket.chat/apps-engine/definition/uikit/IUIKitActionHandler';
-import { UIKitActionButtonInteractionContext, IUIKitResponse } from '@rocket.chat/apps-engine/definition/uikit';
+import { UIKitActionButtonInteractionContext, IUIKitResponse, BlockElementType } from '@rocket.chat/apps-engine/definition/uikit';
 import { UIActionButtonContext } from '@rocket.chat/apps-engine/definition/ui/UIActionButtonContext';
 import { ApiVisibility, ApiSecurity } from '@rocket.chat/apps-engine/definition/api';
 import { Endpoint } from './endpoints/Endpoint';
+import { IUIKitContextualBarViewParam } from '@rocket.chat/apps-engine/definition/uikit/UIKitInteractionResponder';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload, IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -49,17 +51,19 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
             room,
             message
         } = context.getInteractionData();
-        if (actionId === 'my-action-id') {
-            const blockBuilder = modify.getCreator().getBlockBuilder();
-
-            return context.getInteractionResponder().openModalViewResponse({
-                title: blockBuilder.newPlainTextObject('Interaction received'),
-                blocks: blockBuilder.addSectionBlock({
-                    text: blockBuilder.newPlainTextObject('We received your interaction, thanks!')
-                }).getBlocks()
-            });
+        switch (actionId) {
+            case 'my-action-id':
+                const blockBuilder = modify.getCreator().getBlockBuilder();
+                return context.getInteractionResponder().openModalViewResponse({
+                    title: blockBuilder.newPlainTextObject('Interaction received'),
+                    blocks: blockBuilder.addSectionBlock({
+                        text: blockBuilder.newPlainTextObject('We received your interaction, thanks!')
+                    }).getBlocks()
+                });
+            case 'my-omichannel-action-id':
+                const contextualbarBlocks = await createContextualBarBlocks(modify,read.getLivechatReader());
+                await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
         }
-
         return context.getInteractionResponder().successResponse();
     }
 
@@ -76,7 +80,7 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         await configuration.slashCommands.provideSlashCommand(postRequestCommand);
         const httpRequestCommand: HttpRequestCommand = new HttpRequestCommand('http');
         await configuration.slashCommands.provideSlashCommand(httpRequestCommand);
-        const rocketchatRequestCommand: HttpRequestCommand = new HttpRequestCommand('rc',new RocketChatHeaderBuilder());
+        const rocketchatRequestCommand: HttpRequestCommand = new HttpRequestCommand('rc', new RocketChatHeaderBuilder());
         await configuration.slashCommands.provideSlashCommand(rocketchatRequestCommand);
         const contextualBarCommand: OpenCtxBarCommand = new OpenCtxBarCommand();
         await configuration.slashCommands.provideSlashCommand(contextualBarCommand);
@@ -104,9 +108,14 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
         });
 
         configuration.ui.registerButton({
-            actionId: 'my-action-id', // this identifies your button in the interaction event
-            labelI18n: 'my-action-name', // key of the i18n string containing the name of the button
-            context: UIActionButtonContext.ROOM_ACTION, // in what context the action button will be displayed in the UI
+            actionId: 'my-action-id',
+            labelI18n: 'my-action-name',
+            context: UIActionButtonContext.ROOM_ACTION,
+        });
+        configuration.ui.registerButton({
+            actionId: 'my-omichannel-action-id',
+            labelI18n: 'my-omnichannel-action-name',
+            context: UIActionButtonContext.ROOM_ACTION,
         });
 
         configuration.api.provideApi({
@@ -158,4 +167,22 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
     async executePreMessageSentPrevent(message: IMessage, read: IRead, http: IHttp, persistence: IPersistence): Promise<boolean> {
         return message.text == 'test';
     }
+}
+
+export async function createContextualBarBlocks(modify: IModify, livechatReader: ILivechatRead, viewId?: string): Promise<IUIKitContextualBarViewParam> {
+    const blocks = modify.getCreator().getBlockBuilder();
+    const departments = await livechatReader.getDepartmentsEnabledWithAgents();
+    let text = '';
+    for (let i = 0; i < departments.length; i++) {
+        text = (text != '' ? text + '\n' : text);
+        text = text + departments[i].name +': '+departments[i].numberOfAgents+' agents';
+    }
+    blocks.addSectionBlock({
+        text: blocks.newMarkdownTextObject(text)
+    });
+    return {
+        id: viewId || 'departmentsbarId',
+        title: blocks.newPlainTextObject('Departments'),
+        blocks: blocks.getBlocks()
+    };
 }

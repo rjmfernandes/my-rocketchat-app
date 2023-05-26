@@ -15,6 +15,15 @@
     "implements": [
         "IPreMessageSentPrevent",
         "IPostMessageSent",
-        "IPreFileUpload"
+        "IPreFileUpload",
+        "IUIKitInteractionHandler"
+    ],
+    "permissions": [
+        {
+            "name": "ui.registerButtons"
+        },
+        {
+            "name": "slashcommand"
+        }
     ]
 }

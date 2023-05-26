@@ -16,5 +16,6 @@
     "my_rocketchat_command_params_example": "",
     "my_rocketchat_command_description": "A Rocket.Chat request slash command calling through GET/POST depending on 1st argument the URL passed as second argument with optional payload for POST passed as third argument.",
     "contextualbar_command_params_example": "",
-    "contextualbar_command_description": "A slash command for opening a contextual bar."
+    "contextualbar_command_description": "A slash command for opening a contextual bar.",
+    "my-action-name": "My Action"
 }

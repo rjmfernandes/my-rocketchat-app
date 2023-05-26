@@ -22,11 +22,43 @@ import { HttpRequestCommand } from './commands/HttpRequestCommand';
 import { SettingType } from '@rocket.chat/apps-engine/definition/settings/SettingType';
 import { RocketChatHeaderBuilder } from './commands/RocketChatHeaderBuilder';
 import { OpenCtxBarCommand } from './commands/OpenCtxBarCommand';
+import { IUIKitInteractionHandler } from '@rocket.chat/apps-engine/definition/uikit/IUIKitActionHandler';
+import { UIKitActionButtonInteractionContext, IUIKitResponse } from '@rocket.chat/apps-engine/definition/uikit';
+import { UIActionButtonContext } from '@rocket.chat/apps-engine/definition/ui/UIActionButtonContext';
 
-export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload {
+export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload, IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
         logger.debug('Hello, World!');
+    }
+
+    public async executeActionButtonHandler(
+        context: UIKitActionButtonInteractionContext,
+        read: IRead,
+        http: IHttp,
+        persistence: IPersistence,
+        modify: IModify
+    ): Promise<IUIKitResponse> {
+        const {
+            buttonContext,
+            actionId,
+            triggerId,
+            user,
+            room,
+            message
+        } = context.getInteractionData();
+        if (actionId === 'my-action-id') {
+            const blockBuilder = modify.getCreator().getBlockBuilder();
+
+            return context.getInteractionResponder().openModalViewResponse({
+                title: blockBuilder.newPlainTextObject('Interaction received'),
+                blocks: blockBuilder.addSectionBlock({
+                    text: blockBuilder.newPlainTextObject('We received your interaction, thanks!')
+                }).getBlocks()
+            });
+        }
+
+        return context.getInteractionResponder().successResponse();
     }
 
     public async extendConfiguration(
@@ -69,6 +101,11 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
             i18nDescription: 'my_rocketchat_app_user_id_desc',
         });
 
+        configuration.ui.registerButton({
+            actionId: 'my-action-id', // this identifies your button in the interaction event
+            labelI18n: 'my-action-name', // key of the i18n string containing the name of the button
+            context: UIActionButtonContext.ROOM_ACTION, // in what context the action button will be displayed in the UI
+        });
     }
 
     async [AppMethod.EXECUTE_PRE_FILE_UPLOAD](context: IFileUploadContext, read: IRead, http: IHttp, persis: IPersistence, modify: IModify): Promise<void> {

@@ -24,6 +24,24 @@
         },
         {
             "name": "slashcommand"
+        },
+        {
+            "name": "room.read"
+        },
+        {
+            "name": "message.write"
+        },
+        {
+            "name": "user.read"
+        },
+        {
+            "name": "user.write"
+        },
+        {
+            "name": "networking"
+        },
+        {
+            "name": "ui.interact"
         }
     ]
 }

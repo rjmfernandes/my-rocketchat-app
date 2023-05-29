@@ -24,7 +24,7 @@ import { SettingType } from '@rocket.chat/apps-engine/definition/settings/Settin
 import { RocketChatHeaderBuilder } from './commands/RocketChatHeaderBuilder';
 import { OpenCtxBarCommand } from './commands/OpenCtxBarCommand';
 import { IUIKitInteractionHandler } from '@rocket.chat/apps-engine/definition/uikit/IUIKitActionHandler';
-import { UIKitActionButtonInteractionContext, IUIKitResponse, BlockElementType } from '@rocket.chat/apps-engine/definition/uikit';
+import { UIKitActionButtonInteractionContext, IUIKitResponse, BlockElementType, UIKitViewCloseInteractionContext } from '@rocket.chat/apps-engine/definition/uikit';
 import { UIActionButtonContext } from '@rocket.chat/apps-engine/definition/ui/UIActionButtonContext';
 import { ApiVisibility, ApiSecurity } from '@rocket.chat/apps-engine/definition/api';
 import { Endpoint } from './endpoints/Endpoint';
@@ -166,6 +166,9 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
     }
     async executePreMessageSentPrevent(message: IMessage, read: IRead, http: IHttp, persistence: IPersistence): Promise<boolean> {
         return message.text == 'test';
+    }
+    public async executeViewClosedHandler(context: UIKitViewCloseInteractionContext, read: IRead, http: IHttp, persistence: IPersistence, modify: IModify): Promise<IUIKitResponse> {
+        return context.getInteractionResponder().successResponse();
     }
 }
 

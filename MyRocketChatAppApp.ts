@@ -29,6 +29,7 @@ import { UIActionButtonContext } from '@rocket.chat/apps-engine/definition/ui/UI
 import { ApiVisibility, ApiSecurity } from '@rocket.chat/apps-engine/definition/api';
 import { Endpoint } from './endpoints/Endpoint';
 import { IUIKitContextualBarViewParam } from '@rocket.chat/apps-engine/definition/uikit/UIKitInteractionResponder';
+import { get, jsonFormat } from './utils/HttpUtils';
 
 export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload, IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -61,7 +62,7 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
                     }).getBlocks()
                 });
             case 'my-omichannel-action-id':
-                const contextualbarBlocks = await createContextualBarBlocks(modify,read.getLivechatReader());
+                const contextualbarBlocks = await createContextualBarBlocks(modify, read.getLivechatReader(), http, read);
                 await modify.getUiController().openContextualBarView(contextualbarBlocks, { triggerId }, user);
         }
         return context.getInteractionResponder().successResponse();
@@ -172,13 +173,26 @@ export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, I
     }
 }
 
-export async function createContextualBarBlocks(modify: IModify, livechatReader: ILivechatRead, viewId?: string): Promise<IUIKitContextualBarViewParam> {
+export async function createContextualBarBlocks(modify: IModify, livechatReader: ILivechatRead, http: IHttp, read: IRead, viewId?: string): Promise<IUIKitContextualBarViewParam> {
     const blocks = modify.getCreator().getBlockBuilder();
     const departments = await livechatReader.getDepartmentsEnabledWithAgents();
     let text = '';
+    const rocketchatHeader = await (new RocketChatHeaderBuilder()).buildHeaders(read);
     for (let i = 0; i < departments.length; i++) {
         text = (text != '' ? text + '\n' : text);
-        text = text + departments[i].name +': '+departments[i].numberOfAgents+' agents';
+        text = text + departments[i].name + ': ' + departments[i].numberOfAgents + ' agents\n';
+        let departmentId = departments[i].id;
+        let response = await get(`http://localhost:3000/api/v1/livechat/department/${departmentId}/agents`, http, rocketchatHeader);
+        if (response.data.agents) {
+            text = text + '`agents: ';
+            for (let j = 0; j < response.data.agents.length; j++) {
+                text = text + response.data.agents[j].username;
+                if (j != response.data.agents.length - 1) {
+                    text = text + ', ';
+                }
+            }
+            text = text + '`';
+        }
     }
     blocks.addSectionBlock({
         text: blocks.newMarkdownTextObject(text)

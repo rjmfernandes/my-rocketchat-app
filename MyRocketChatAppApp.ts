@@ -7,6 +7,7 @@ import {
     IModify,
     IPersistence,
     IRead,
+    IRoomBuilder,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IMessage, IPostMessageSent } from '@rocket.chat/apps-engine/definition/messages';
@@ -29,12 +30,34 @@ import { UIActionButtonContext } from '@rocket.chat/apps-engine/definition/ui/UI
 import { ApiVisibility, ApiSecurity } from '@rocket.chat/apps-engine/definition/api';
 import { Endpoint } from './endpoints/Endpoint';
 import { IUIKitContextualBarViewParam } from '@rocket.chat/apps-engine/definition/uikit/UIKitInteractionResponder';
-import { get, jsonFormat } from './utils/HttpUtils';
+import { get } from './utils/HttpUtils';
+import { IPreRoomCreateModify } from '@rocket.chat/apps-engine/definition/rooms/IPreRoomCreateModify';
+import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 
-export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload, IUIKitInteractionHandler {
+export class MyRocketChatAppApp extends App implements IPreMessageSentPrevent, IPostMessageSent, IPreFileUpload, IUIKitInteractionHandler, IPreRoomCreateModify {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
         logger.debug('Hello, World!');
+    }
+    async checkPreRoomCreateModify?(room: IRoom, read: IRead, http: IHttp): Promise<boolean> {
+        return room.creator.customFields && room.creator.customFields.team;
+    }
+    async executePreRoomCreateModify(room: IRoom, builder: IRoomBuilder, read: IRead, http: IHttp, persistence: IPersistence): Promise<IRoom> {
+        if (room.creator.customFields && room.creator.customFields.team) {
+            builder = builder.setSlugifiedName(room.creator.customFields.team + '-' + room.slugifiedName);
+            builder = builder.setCreator(room.creator);
+            builder = builder.setType(room.type);
+            if (room.displaySystemMessages)
+                builder = builder.setDisplayingOfSystemMessages(room.displaySystemMessages)
+            if (room.isReadOnly)
+                builder.setReadOnly(room.isReadOnly)
+            if (room.customFields)
+                builder = builder.setCustomFields(room.customFields);
+            if (room.isDefault)
+                builder = builder.setDefault(room.isDefault)
+            builder = builder.setDisplayName(room.creator.customFields.team + ' - ' + room.displayName);
+            return builder.getRoom();
+        } else return room;
     }
 
     public async executeActionButtonHandler(

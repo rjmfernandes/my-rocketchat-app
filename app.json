@@ -16,7 +16,8 @@
         "IPreMessageSentPrevent",
         "IPostMessageSent",
         "IPreFileUpload",
-        "IUIKitInteractionHandler"
+        "IUIKitInteractionHandler",
+        "IPreRoomCreateModify"
     ],
     "permissions": [
         {
